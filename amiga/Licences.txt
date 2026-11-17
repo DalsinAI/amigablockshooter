@@ -1,0 +1,15 @@
+Block Shooter: licences
+=======================
+
+The game: Block Shooter, Copyright (c) 2019 towerofglass,
+https://github.com/towerofglass/block-shooter, under the MIT licence
+(LICENSE-MIT.txt). Its sprite sheet (the blocks and arrows) is built into
+the program; its rules are rewritten in C (amiga/bs_core.c) from its
+main.js. Phaser, which upstream runs in, is not used.
+
+- SDL is GFOpenUp's (LIBS:GFOpenGPU/SDL2.module).
+- The Amiga port's own files (amiga/, AMIGA_PORT.md, tests/, tools/,
+  package/) are under the MIT licence, like Block Shooter; the block font
+  and the GlowIcon art are The AmiCradle Team's own.
+
+Designed, tested and delivered by The AmiCradle Team.
