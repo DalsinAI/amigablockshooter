@@ -1,0 +1,15 @@
+Block Shooter: controls
+=======================
+
+Left mouse button   on a waiting block beside the field: shoot it in
+                    (the front block of that row or column goes)
+                    on RESTART (top left): end this game
+                    after GAME OVER: a new game
+Esc                 quit
+
+The blocks slide until they meet another. Three or more of one colour
+touching vanish: 3 points for three, 3 more for each block past three.
+A block's arrow keeps it moving that way whenever the way opens; one that
+slides off the field goes back to the queue on that side. Clear the field
+for 100 points and a new one. The game ends when every square round the
+field's edge is taken.

@@ -1,0 +1,72 @@
+# Block Shooter for GFOS (AmigaOS 3.2 with GFOpenUp), 68040/68060, on
+# GFOpenUp's SDL 2 (SDL2.module). The rules: amiga/bs_core.c; the picture:
+# amiga/bs_main.c; the blocks: upstream's sprite sheet, built in by
+# tools/png2c.py.
+#
+#   make -f amiga/Makefile.amigaos -j4 BS=/path/to/block-shooter [STOVE=...]
+#
+# BS is upstream Block Shooter at the commit package/blockshooter.lock names;
+# package/build-amiga.sh fetches it.
+#
+# Output: build/amigaos/BlockShooter/ (the drawer: BlockShooter, ReadMe,
+# Controls and the licences, with GlowIcons), build/amigaos/BlockShooter.info
+# and Install-BlockShooter beside them.
+
+BS        ?= ../block-shooter
+STOVE     ?= $(HOME)/AmiCradle/stoves/os32-gcc16-open6
+PREFIX    ?= $(STOVE)/prefix
+SDLKIT    ?= $(PREFIX)/m68k-amigaos
+CC        = $(PREFIX)/bin/m68k-amigaos-gcc
+STRIP     = $(PREFIX)/bin/m68k-amigaos-strip
+PYTHON    ?= python3
+# the game is integer only; -m68881 because GFOpenUp's SDL kit is
+CPU       ?= -m68040 -m68881
+OPT       ?= -O2 -fomit-frame-pointer -fno-tree-loop-distribute-patterns
+CFLAGS    = -noixemul $(OPT) $(CPU) -std=gnu99 -Wall -Iamiga -I$(SDLKIT)/include -I$(SDLKIT)/include/SDL2
+LDFLAGS   = -noixemul $(CPU)
+LIBS      = -L$(SDLKIT)/lib -lSDL2 -lm -lpthread
+
+BUILD     = build/amigaos
+OBJDIR    = $(BUILD)/obj
+OUT       = $(BUILD)/BlockShooter
+PROG      = BlockShooter
+OBJS      = $(OBJDIR)/bs_main.o $(OBJDIR)/bs_core.o $(OBJDIR)/bs_sheet.o $(OBJDIR)/amiga_start.o
+DOCS      = AMIGA_PORT.md amiga/Licences.txt amiga/Controls
+
+all: $(OUT)/$(PROG) package
+
+$(BUILD)/$(PROG).debug: $(OBJS)
+	@mkdir -p $(BUILD)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+$(OUT)/$(PROG): $(BUILD)/$(PROG).debug
+	@mkdir -p $(OUT)
+	$(STRIP) -o $@ $<
+
+package: $(OUT)/$(PROG) $(DOCS)
+	cp amiga/Controls $(OUT)/Controls
+	cp AMIGA_PORT.md $(OUT)/ReadMe
+	cp $(BS)/LICENSE.md $(OUT)/LICENSE-MIT.txt
+	cp amiga/Licences.txt $(OUT)/Licences.txt
+	cp amiga/icons/BlockShooter.info amiga/icons/ReadMe.info $(OUT)/
+	for f in LICENSE-MIT.txt Licences.txt Controls; do \
+	    cp amiga/icons/ReadMe.info $(OUT)/$$f.info; done
+	cp amiga/icons/BlockShooter-drawer.info $(BUILD)/BlockShooter.info
+	cp amiga/Install-BlockShooter amiga/Install-BlockShooter.info $(BUILD)/
+
+$(BUILD)/bs_sheet.c: $(BS)/blocks-arrows.3.png tools/png2c.py
+	@mkdir -p $(BUILD)
+	$(PYTHON) tools/png2c.py $< $@ bs_sheet
+
+$(OBJDIR)/bs_sheet.o: $(BUILD)/bs_sheet.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/%.o: amiga/%.c amiga/bs_core.h
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all package clean

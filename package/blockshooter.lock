@@ -1,0 +1,7 @@
+# What package/build-amiga.sh fetches (none of it is kept in this repository).
+# Upstream Block Shooter: towerofglass's 2019 BrickShooter remake, MIT. The
+# port takes its sprite sheet (blocks-arrows.3.png); its rules are rewritten
+# in C in amiga/bs_core.c.
+BS_URL=https://github.com/towerofglass/block-shooter
+BS_COMMIT=11441936340c6e882ba05fb40d219d769924ee58
+PORT_VERSION=1.0-gfos1
